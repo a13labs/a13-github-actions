@@ -41,7 +41,7 @@ jobs:
         with:
           image: ${{ inputs.image }}
           addLatest: true
-          dockerfile: Dockerfile.ci
+          dockerfile: ${{ inputs.dockerfile }}
           username: ${{ secrets.registry_user }}
           password: ${{ secrets.registry_password }}
           registry: ${{ inputs.registry }}
