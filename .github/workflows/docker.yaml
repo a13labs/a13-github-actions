@@ -5,7 +5,7 @@ on:
       registry:
         required: false
         type: string
-        default: nexus.alexpires.me/repository/a13labs
+        default: docker.alexpires.me/repository/a13labs
       dockerfile:
         required: false
         type: string
