@@ -1,0 +1,49 @@
+name: Build, Deploy and release Docker images
+on:
+  workflow_call:
+    inputs:
+      registry:
+        required: false
+        type: string
+        default: nexus.alexpires.me/repository/a13labs
+      dockerfile:
+        required: false
+        type: string
+        default: Dockerfile
+      image:
+        required: true
+        type: string
+    secrets:
+      registry_user:
+        required: true
+      registry_password:
+        required: true
+
+jobs:
+  build_deploy:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOCKER_PUSH: ${{ contains(inputs.github_ref, 'refs/heads/main') || contains(inputs.github_ref, 'refs/tags/v')}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Verifying Dockerfile
+        uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: ${{ inputs.dockerfile }}
+          format: tty
+          failure-threshold: error 
+
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker image
+        with:
+          image: ${{ inputs.image }}
+          addLatest: true
+          dockerfile: Dockerfile.ci
+          username: ${{ secrets.registry_user }}
+          password: ${{ secrets.registry_password }}
+          registry: ${{ inputs.registry }}
